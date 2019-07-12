@@ -2,6 +2,8 @@
   <div class="tree">
     <div class="tree-title" >
       树结构：添加同级、添加子级、删除、拖拽、双击修改名称
+      <br>
+      依赖：vue、element-ui、sass
     </div>
     <my-tree
       @addBrother="addBrother"
