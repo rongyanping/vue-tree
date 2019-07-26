@@ -4,24 +4,26 @@
       class="brother"
       v-for="(data, idx) of treeData"
       :key="idx">
-      <div class="node"
+      <!-- box -->
+      <div :class="{'node':true,'activeNode':data.active}"
            @drop="drop($event,treeData,idx)"
-           @dragover="allowDrop($event,treeData,idx)">
-
-        <span @click="data.expand=!data.expand">
+           @dragover="allowDrop($event,treeData,idx)"
+           @click="treeClickHandle(data)">
+        <!-- icon -->
+        <span @click="data.expand=!data.expand" class="icon_box">
           <i class="el-icon-caret-bottom" v-if="data.expand && data.type==='group'"></i>
           <i class="el-icon-caret-right" v-if="!data.expand && data.type==='group'"></i>
         </span>
-
+        <!-- name -->
+        <input type="checkbox" v-model="data.checked" @change="checkeboxHandle($event,data)">
         <div :draggable="!data.editable"
              :class="{'cname_child':true,'cname_child_edit':data.editable}"
              :contentEditable="data.editable"
              @dragstart="drag($event,treeData,idx)"
-             @dblclick="dbclickHandle($event,treeData,idx)"
-             @click="data.expand=!data.expand">
-            {{data.name}}
+             @dblclick="dbclickHandle($event,treeData,idx)">
+          {{data.name}}
         </div>
-
+        <!-- 操作 -->
         <button class="operation_btn" v-if=" data.type==='group'" @click="addBrother($event,data)">添加同级</button>
         <button class="operation_btn" v-if=" data.type==='group'" @click="addChild($event,data)">添加子级</button>
         <button class="operation_btn" v-if=" data.type==='group'"  @click="deleteNode($event, data)">删除</button>
@@ -38,7 +40,9 @@
           @deleteNode="deleteNode"
           @dragBegin="drag"
           @dragStop="drop"
-          @dbclickChangeName="dbclickChangeName">
+          @dbclickChangeName="dbclickChangeName"
+          @treeClickHandle="treeClickHandle"
+          @checkeboxHandle="checkeboxHandle">
         </my-tree>
       </div>
     </div>
@@ -85,7 +89,26 @@
       },
 
     },
+    data:function(){
+      return {
+        active_tree:false,
+      }
+    },
+    created:function(){
+      this.treeData = this.treeData;
+    },
     methods: {
+      // checkbox
+      checkeboxHandle(event,data){
+        // console.log('checkbox=====',event,data);
+        this.$emit('checkeboxHandle',event,data);
+      },
+      // 点击name
+      treeClickHandle(data){
+        this.$emit('treeClickHandle',data);
+        // console.log('click=====',data);
+      },
+
       // 双击
       dbclickHandle(event,data,index){
         const _this = this;
@@ -162,6 +185,9 @@
       .node{
         display: flex;
         align-items: center;
+        .icon_box{
+          margin-top: -5px;
+        }
         .cname_child{
           border-style: none;
           outline: none;
@@ -173,6 +199,9 @@
         .operation_btn{
           margin-left: 20px
         }
+      }
+      .activeNode{
+        background: #7ec4cc;
       }
       .children {
         position: relative;
